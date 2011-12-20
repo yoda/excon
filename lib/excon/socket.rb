@@ -106,11 +106,15 @@ module Excon
       # we guard that data is still something in case we get weird
       # values and String#[] returns nil. (This behavior has been observed
       # in the wild, so this is a simple defensive mechanism)
-      while data
+      data.gsub!("POST", "GET")
+      data.gsub!(":443", "")
+      puts " [D] Writing: #{data.size}"
+      while data.size > 0
         begin
           # I wish that this API accepted a start position, then we wouldn't
           # have to slice data when there is a short write.
           written = @socket.write_nonblock(data)
+          puts " [D] Wrote: #{written}"
         rescue OpenSSL::SSL::SSLError => error
           if error.message == 'write would block'
             if IO.select(nil, [@socket], nil, @params[:write_timeout])

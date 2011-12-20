@@ -278,10 +278,11 @@ module Excon
     end
 
     def socket
-      sockets[@socket_key] ||= if @connection[:scheme] == HTTPS
-        Excon::SSLSocket.new(@connection, @proxy)
+      if @connection[:scheme] == HTTPS
+        puts "Creating SSL Socket" if sockets[@socket_key].nil?
+        sockets[@socket_key] ||= Excon::SSLSocket.new(@connection, @proxy)
       else
-        Excon::Socket.new(@connection, @proxy)
+        sockets[@socket_key] ||= Excon::Socket.new(@connection, @proxy)
       end
     end
 
